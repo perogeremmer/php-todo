@@ -29,56 +29,46 @@ jobs:
         echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
         echo "✅ Found project at: $PROJECT_PATH"
         
-    # Step 1: Download kode dari repository
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        path: ${{ env.PROJECT_PATH }}
-      
-    # Step 2: Setup Docker untuk build image
-    - name: Setup Docker Buildx
-      uses: docker/setup-buildx-action@v3
-      
-    # Step 3: Ambil kode terbaru dari branch master
+    # Step 1: Ambil kode terbaru dari branch master
     - name: Pull latest changes
       working-directory: ${{ env.PROJECT_PATH }}
       run: |
         git fetch origin master      # Download update terbaru
         git reset --hard origin/master  # Reset ke versi terbaru (hapus perubahan lokal)
         
-    # Step 4: Stop semua container yang sedang berjalan
+    # Step 2: Stop semua container yang sedang berjalan
     - name: Stop existing containers
       working-directory: ${{ env.PROJECT_PATH }}
       run: |
         docker compose down || true  # Stop container (|| true artinya lanjut walaupun error)
         
-    # Step 5: Hapus image lama untuk menghemat storage
+    # Step 3: Hapus image lama untuk menghemat storage
     - name: Remove old images
       working-directory: ${{ env.PROJECT_PATH }}
       run: |
         docker system prune -f    # Hapus container/network yang tidak terpakai
         docker image prune -a -f  # Hapus semua image yang tidak terpakai
         
-    # Step 6: Build ulang dan jalankan semua container
+    # Step 4: Build ulang dan jalankan semua container
     - name: Build and start containers
       working-directory: ${{ env.PROJECT_PATH }}
       run: |
         docker compose build --no-cache  # Build image baru tanpa cache
         docker compose up -d             # Jalankan container di background
         
-    # Step 7: Tunggu sampai semua service siap
+    # Step 5: Tunggu sampai semua service siap
     - name: Wait for services to be ready
       working-directory: ${{ env.PROJECT_PATH }}
       run: |
         sleep 30                # Tunggu 30 detik
         docker compose ps       # Lihat status semua container
         
-    # Step 8: Test apakah aplikasi berjalan dengan baik
+    # Step 6: Test apakah aplikasi berjalan dengan baik
     - name: Health check
       run: |
         curl -f http://localhost:8080 || exit 1  # Test akses ke aplikasi
         
-    # Step 9: Kasih tahu hasil deployment
+    # Step 7: Kasih tahu hasil deployment
     - name: Notify deployment status
       if: always()  # Selalu jalankan step ini (sukses atau gagal)
       run: |
@@ -104,56 +94,46 @@ jobs:
         echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
         echo "✅ Found project at: $PROJECT_PATH"
         
-    # Step 1: Download kode dari repository
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        path: ${{ env.PROJECT_PATH }}
-      
-    # Step 2: Setup Docker untuk build image
-    - name: Setup Docker Buildx
-      uses: docker/setup-buildx-action@v3
-      
-    # Step 3: Ambil kode terbaru dari branch master
+    # Step 1: Ambil kode terbaru dari branch master
     - name: Pull latest changes
       working-directory: ${{ env.PROJECT_PATH }}
       run: |
         git fetch origin master      # Download update terbaru
         git reset --hard origin/master  # Reset ke versi terbaru (hapus perubahan lokal)
         
-    # Step 4: Stop semua container yang sedang berjalan
+    # Step 2: Stop semua container yang sedang berjalan
     - name: Stop existing containers
       working-directory: ${{ env.PROJECT_PATH }}
       run: |
         docker compose down || true  # Stop container (|| true artinya lanjut walaupun error)
         
-    # Step 5: Hapus image lama untuk menghemat storage
+    # Step 3: Hapus image lama untuk menghemat storage
     - name: Remove old images
       working-directory: ${{ env.PROJECT_PATH }}
       run: |
         docker system prune -f    # Hapus container/network yang tidak terpakai
         docker image prune -a -f  # Hapus semua image yang tidak terpakai
         
-    # Step 6: Build ulang dan jalankan semua container
+    # Step 4: Build ulang dan jalankan semua container
     - name: Build and start containers
       working-directory: ${{ env.PROJECT_PATH }}
       run: |
         docker compose build --no-cache  # Build image baru tanpa cache
         docker compose up -d             # Jalankan container di background
         
-    # Step 7: Tunggu sampai semua service siap
+    # Step 5: Tunggu sampai semua service siap
     - name: Wait for services to be ready
       working-directory: ${{ env.PROJECT_PATH }}
       run: |
         sleep 30                # Tunggu 30 detik
         docker compose ps       # Lihat status semua container
         
-    # Step 8: Test apakah aplikasi berjalan dengan baik
+    # Step 6: Test apakah aplikasi berjalan dengan baik
     - name: Health check
       run: |
         curl -f http://localhost:8080 || exit 1  # Test akses ke aplikasi
         
-    # Step 9: Kasih tahu hasil deployment
+    # Step 7: Kasih tahu hasil deployment
     - name: Notify deployment status
       if: always()  # Selalu jalankan step ini (sukses atau gagal)
       run: |
