@@ -34,7 +34,7 @@ jobs:
     # Step 4: Stop semua container yang sedang berjalan
     - name: Stop existing containers
       run: |
-        docker-compose down || true  # Stop container (|| true artinya lanjut walaupun error)
+        docker compose down || true  # Stop container (|| true artinya lanjut walaupun error)
         
     # Step 5: Hapus image lama untuk menghemat storage
     - name: Remove old images
@@ -45,14 +45,14 @@ jobs:
     # Step 6: Build ulang dan jalankan semua container
     - name: Build and start containers
       run: |
-        docker-compose build --no-cache  # Build image baru tanpa cache
-        docker-compose up -d             # Jalankan container di background
+        docker compose build --no-cache  # Build image baru tanpa cache
+        docker compose up -d             # Jalankan container di background
         
     # Step 7: Tunggu sampai semua service siap
     - name: Wait for services to be ready
       run: |
         sleep 30                # Tunggu 30 detik
-        docker-compose ps       # Lihat status semua container
+        docker compose ps       # Lihat status semua container
         
     # Step 8: Test apakah aplikasi berjalan dengan baik
     - name: Health check
