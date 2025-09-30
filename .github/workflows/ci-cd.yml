@@ -1,0 +1,70 @@
+# Workflow GitHub Actions untuk Auto Deploy PHP Todo App
+# Workflow ini akan berjalan otomatis ketika ada push ke branch master
+# Fungsinya: pull kode terbaru dan rebuild semua Docker container
+
+name: CI/CD Auto Pull and Rebuild
+
+# Kapan workflow ini akan dijalankan:
+# 1. Ketika ada push ke branch master (otomatis)
+# 2. Manual trigger melalui GitHub Actions tab
+on:
+  push:
+    branches: [ master ]  # Hanya berjalan ketika push ke master
+  workflow_dispatch:      # Bisa dijalankan manual juga
+
+jobs:
+  deploy:
+    runs-on: my-laptop  # Ganti dengan label runner untuk dijalankan
+    
+    steps:
+    # Step 1: Download kode dari repository
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    # Step 2: Setup Docker untuk build image
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    # Step 3: Ambil kode terbaru dari branch master
+    - name: Pull latest changes
+      run: |
+        git fetch origin master      # Download update terbaru
+        git reset --hard origin/master  # Reset ke versi terbaru (hapus perubahan lokal)
+        
+    # Step 4: Stop semua container yang sedang berjalan
+    - name: Stop existing containers
+      run: |
+        docker-compose down || true  # Stop container (|| true artinya lanjut walaupun error)
+        
+    # Step 5: Hapus image lama untuk menghemat storage
+    - name: Remove old images
+      run: |
+        docker system prune -f    # Hapus container/network yang tidak terpakai
+        docker image prune -a -f  # Hapus semua image yang tidak terpakai
+        
+    # Step 6: Build ulang dan jalankan semua container
+    - name: Build and start containers
+      run: |
+        docker-compose build --no-cache  # Build image baru tanpa cache
+        docker-compose up -d             # Jalankan container di background
+        
+    # Step 7: Tunggu sampai semua service siap
+    - name: Wait for services to be ready
+      run: |
+        sleep 30                # Tunggu 30 detik
+        docker-compose ps       # Lihat status semua container
+        
+    # Step 8: Test apakah aplikasi berjalan dengan baik
+    - name: Health check
+      run: |
+        curl -f http://localhost:8080 || exit 1  # Test akses ke aplikasi
+        
+    # Step 9: Kasih tahu hasil deployment
+    - name: Notify deployment status
+      if: always()  # Selalu jalankan step ini (sukses atau gagal)
+      run: |
+        if [ ${{ job.status }} == 'success' ]; then
+          echo "✅ Deployment berhasil! Aplikasi sudah update ke versi terbaru"
+        else
+          echo "❌ Deployment gagal! Cek log error di atas"
+        fi

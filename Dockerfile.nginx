@@ -1,0 +1,32 @@
+# Pakai official Nginx image (Alpine version - lebih kecil dan aman)
+FROM nginx:1.25-alpine
+
+# Install curl buat health check
+RUN apk add --no-cache curl
+
+# Hapus konfigurasi default nginx
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Copy konfigurasi nginx kita yang sudah disederhanakan
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Bikin direktori buat file aplikasi
+RUN mkdir -p /var/www/html
+
+# TIDAK COPY file aplikasi di sini - pakai volume mounting
+# Supaya kalau mahasiswa edit CSS/HTML, langsung keliatan
+# tanpa perlu rebuild image nginx
+
+# Set permission untuk direktori (akan di-override sama volume)
+RUN chown -R nginx:nginx /var/www/html \
+    && chmod -R 755 /var/www/html
+
+# Expose port 80 untuk HTTP
+EXPOSE 80
+
+# Health check buat mastiin nginx bisa serve halaman
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost/ || exit 1
+
+# Jalanin Nginx di foreground (daemon off supaya container gak exit)
+CMD ["nginx", "-g", "daemon off;"]
