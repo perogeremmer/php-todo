@@ -14,7 +14,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: my-laptop  # Ganti dengan label runner untuk dijalankan
+    runs-on: self-hosted  # Ganti dengan label runner untuk dijalankan
     
     steps:
     # Step 1: Download kode dari repository
