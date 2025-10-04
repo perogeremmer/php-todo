@@ -1,17 +1,49 @@
 <?php
+/**
+ * Todo List Application - Main View (index.php)
+ * 
+ * This file serves as the main dashboard for the Todo List application.
+ * It demonstrates a complete MVC-like structure for a simple CRUD application
+ * that would be perfect for GitHub Copilot to analyze and enhance.
+ * 
+ * Key Features Demonstrated:
+ * - PHP session management for flash messages
+ * - GET parameter handling for filtering
+ * - Bootstrap 5 integration for responsive UI
+ * - Secure output with XSS prevention
+ * - Clean separation of concerns (view logic separate from business logic)
+ * 
+ * @author Dosen DevOps Course
+ * @version 1.0
+ * @since 2024
+ */
+
+// Include all business logic functions
 require_once 'functions.php';
 
+// Handle status filtering from URL parameters (GET request)
+// Uses null coalescing operator (??) for safe parameter handling
 $statusFilter = $_GET['status'] ?? 'all';
+
+// Retrieve todos from database based on filter
 $todos = getAllTodos($statusFilter);
+
+// Get any flash messages from session (success/error notifications)
 $message = getMessage();
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Standard HTML5 meta tags for proper rendering -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo List Application</title>
+    
+    <!-- Bootstrap 5 CSS Framework - Modern responsive design -->
+    <!-- GitHub Copilot Note: Using CDN for quick setup in educational/demo projects -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS styles - Local asset management -->
     <link href="assets/style.css" rel="stylesheet">
 </head>
 <body>
@@ -21,7 +53,10 @@ $message = getMessage();
                 <h1 class="mb-4">Todo List Application</h1>
                 
                 <?php if ($message): ?>
+                    <!-- Flash Message Display - Session-based notifications -->
+                    <!-- GitHub Copilot Learning: Conditional rendering with security considerations -->
                     <div class="alert alert-<?= $message['type'] === 'success' ? 'success' : 'danger' ?> alert-dismissible fade show" role="alert">
+                        <!-- Using escape() function to prevent XSS attacks -->
                         <?= escape($message['message']) ?>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>

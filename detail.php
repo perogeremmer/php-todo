@@ -1,9 +1,34 @@
 <?php
+/**
+ * Todo Detail View (detail.php)
+ * 
+ * This file demonstrates a dual-purpose view component that handles both
+ * display and edit modes for individual todo items.
+ * 
+ * GitHub Copilot Learning Points:
+ * - Conditional view rendering (view/edit modes)
+ * - URL parameter handling for state management
+ * - Form pre-population with existing data
+ * - Breadcrumb navigation implementation
+ * - Security through input validation and sanitization
+ * 
+ * DevOps Relevance:
+ * - Single-responsibility principle in action
+ * - Error handling and user feedback
+ * - Responsive design patterns
+ * 
+ * @author Dosen DevOps Course
+ * @version 1.0
+ * @since 2024
+ */
+
 require_once 'functions.php';
 
+// Extract URL parameters for todo ID and edit mode detection
 $id = $_GET['id'] ?? null;
-$edit_mode = isset($_GET['edit']);
+$edit_mode = isset($_GET['edit']);  // Edit mode if 'edit' parameter exists
 
+// Validate that a todo ID was provided
 if (!$id) {
     setMessage('Todo not found', 'error');
     header('Location: index.php');

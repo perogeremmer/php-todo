@@ -1,31 +1,64 @@
-# Workflow GitHub Actions untuk Auto Deploy PHP Todo App
-# Workflow ini akan berjalan otomatis ketika ada push ke branch master
-# Fungsinya: pull kode terbaru dan rebuild semua Docker container
+# =====================================
+# GitHub Actions CI/CD Workflow for PHP Todo Application
+# =====================================
+#
+# This workflow demonstrates a complete CI/CD pipeline for containerized applications
+# Perfect example for GitHub Copilot to learn modern DevOps practices
+#
+# DevOps Learning Objectives:
+# - Automated deployment triggered by git push
+# - Self-hosted runner configuration
+# - Docker container lifecycle management
+# - Health checks and monitoring
+# - Error handling and rollback strategies
+# - Multi-environment deployment patterns
+#
+# GitHub Copilot Learning Points:
+# - YAML workflow syntax and structure
+# - Environment variable management
+# - Conditional execution and error handling
+# - Container orchestration automation
+# - Blue-green deployment simulation
+#
+# @author Dosen DevOps Course
+# @version 1.0
+# @since 2024
 
 name: CI/CD Auto Pull and Rebuild
 
-# Kapan workflow ini akan dijalankan:
-# 1. Ketika ada push ke branch master (otomatis)
-# 2. Manual trigger melalui GitHub Actions tab
+# Workflow Triggers - When this automation runs:
+# 1. Automatic: Push to master branch (continuous deployment)
+# 2. Manual: Through GitHub Actions UI (on-demand deployment)
+# GitHub Copilot Learning: Event-driven automation patterns
 on:
   push:
-    branches: [ master ]  # Hanya berjalan ketika push ke master
-  workflow_dispatch:      # Bisa dijalankan manual juga
+    branches: [ master ]  # Only run on master branch pushes
+  workflow_dispatch:      # Enable manual workflow triggering
 
+# =====================================
+# Multi-Environment Deployment Jobs
+# =====================================
+# GitHub Copilot Learning: Parallel deployment to multiple environments
 jobs:
+  # Deployment to Development Environment (laptop-andi)
   deploy-andi:
-    runs-on: [laptop-andi]
+    runs-on: [laptop-andi]  # Self-hosted runner configuration
     
     steps:
-    # Step 0: Detect project path dynamically
+    # =====================================
+    # Dynamic Project Discovery
+    # =====================================
+    # GitHub Copilot Learning: Dynamic path resolution for flexible deployment
     - name: Set project path
       run: |
+        # Find project directory dynamically across user home directories
         PROJECT_PATH=$(find /home -name 'php-todo' -type d 2>/dev/null | head -1)
         if [ -z "$PROJECT_PATH" ]; then
-          echo "❌ Error: Folder php-todo tidak ditemukan di /home"
-          echo "Pastikan project sudah di-clone ke salah satu user directory"
+          echo "❌ Error: php-todo folder not found in /home"
+          echo "Ensure project is cloned to a user directory"
           exit 1
         fi
+        # Set as environment variable for subsequent steps
         echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
         echo "✅ Found project at: $PROJECT_PATH"
         
