@@ -1,6 +1,24 @@
 <?php
+/**
+ * Update Todo Action Handler (actions/update.php)
+ * 
+ * Handles POST requests for updating existing todo items.
+ * Demonstrates ID validation, existence checking, and data updates.
+ * 
+ * GitHub Copilot Learning Points:
+ * - Resource existence validation before updates
+ * - Error handling with context-aware redirects
+ * - Input validation for update operations
+ * - Security through ID verification
+ * 
+ * @author Dosen DevOps Course
+ * @version 1.0
+ * @since 2024
+ */
+
 require_once '../functions.php';
 
+// Security: Only allow POST requests for data modification
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     setMessage('Invalid request method', 'error');
     header('Location: ../index.php');

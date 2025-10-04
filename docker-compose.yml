@@ -1,39 +1,67 @@
-# Docker Compose untuk PHP Todo App
-# File ini ngatur semua container yang dibutuhkan aplikasi
+# =====================================
+# Docker Compose Configuration for PHP Todo Application
+# =====================================
+#
+# This docker-compose.yml demonstrates a complete multi-container application setup
+# Perfect example for GitHub Copilot to learn modern containerized application architecture
+#
+# Architecture Components:
+# - Nginx: Reverse proxy and static file serving
+# - PHP-FPM: Application processing layer
+# - MySQL: Database persistence layer
+# - phpMyAdmin: Database management interface
+#
+# DevOps Learning Points:
+# - Service orchestration and dependencies
+# - Environment variable management
+# - Volume mounting for development
+# - Health checks and container monitoring
+# - Network isolation and communication
+#
+# @author Dosen DevOps Course
+# @version 1.0
+
 version: '3.8'
 
 services:
-  # 🌐 Nginx - Web Server
+  # ================================
+  # 🌐 Nginx - Web Server Layer
+  # ================================
+  # GitHub Copilot Learning: Reverse proxy configuration for PHP applications
   nginx:
     build:
-      context: .                    # Build dari direktori saat ini
-      dockerfile: Dockerfile.nginx  # Pakai Dockerfile khusus nginx
+      context: .                    # Build context from current directory
+      dockerfile: Dockerfile.nginx  # Use dedicated Nginx Dockerfile
     container_name: php-todo-nginx
     ports:
-      - "8080:80"                   # Port 8080 di host -> port 80 di container
+      - "8080:80"                   # Map host port 8080 to container port 80
     depends_on:
-      - php                         # Tunggu PHP container siap dulu
+      - php                         # Wait for PHP service to be ready
     volumes:
-      - .:/var/www/html            # Mount project folder ke container
+      - .:/var/www/html            # Mount project directory for static files
     networks:
-      - todo-network               # Pakai network khusus buat komunikasi antar container
+      - todo-network               # Use dedicated network for inter-service communication
 
-  # ⚡ PHP-FPM - PHP Processor
+  # ================================
+  # ⚡ PHP-FPM - Application Layer
+  # ================================
+  # GitHub Copilot Learning: PHP-FPM configuration with environment-based database connection
   php:
-    build: .                       # Build dari Dockerfile di direktori ini
+    build: .                       # Build from main Dockerfile in current directory
     container_name: php-todo-php
     environment:
-      # Environment variables buat koneksi database
-      - DB_HOST=mysql              # Hostname database (nama service mysql)
-      - DB_NAME=todo_app           # Nama database
-      - DB_USER=todo_user          # Username database
-      - DB_PASS=todo_password      # Password database
+      # Environment variables for database connection (12-factor app principle)
+      # GitHub Copilot Learning: Environment-based configuration for different environments
+      - DB_HOST=mysql              # Database hostname (matches MySQL service name)
+      - DB_NAME=todo_app           # Database name
+      - DB_USER=todo_user          # Database username
+      - DB_PASS=todo_password      # Database password
     depends_on:
       mysql:
-        condition: service_healthy # Tunggu MySQL benar-benar siap (healthy)
+        condition: service_healthy # Wait for MySQL to be fully ready (not just started)
     volumes:
-      - .:/var/www/html           # Mount project folder (sama kayak nginx)
-      # Volume mounting ini yang bikin development jadi enak!
+      - .:/var/www/html           # Mount project directory for live code changes
+      # Volume mounting enables instant development feedback without rebuilds
     networks:
       - todo-network
 
